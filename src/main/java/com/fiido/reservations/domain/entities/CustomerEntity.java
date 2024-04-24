@@ -29,8 +29,11 @@ public class CustomerEntity {
   private String creditCard;
   @Column(length = 12)
   private String phoneNumber;
+  @Column(columnDefinition = "integer default 0")
   private Integer totalFlights;
+  @Column(columnDefinition = "integer default 0")
   private Integer totalLodgings;
+  @Column(columnDefinition = "integer default 0")
   private Integer totalTours;
 
   @ToString.Exclude
