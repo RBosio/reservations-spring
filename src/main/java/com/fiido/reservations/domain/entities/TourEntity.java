@@ -38,7 +38,7 @@ public class TourEntity {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "tour", orphanRemoval = true)
   private Set<TicketEntity> tickets;
 
-  @ManyToOne()
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_dni")
   private CustomerEntity customer;
 }

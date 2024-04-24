@@ -2,8 +2,10 @@ package com.fiido.reservations.domain.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,20 +25,20 @@ public class TicketEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private LocalDate departureDate;
-  private LocalDate arrivalDate;
+  private LocalDateTime departureDate;
+  private LocalDateTime arrivalDate;
   private LocalDate purchaseDate;
   private BigDecimal price;
-  
-  @ManyToOne()
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "fly_id")
   private FlyEntity fly;
-  
-  @ManyToOne()
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "tour_id", nullable = true)
   private TourEntity tour;
 
-  @ManyToOne()
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_dni")
   private CustomerEntity customer;
 }
