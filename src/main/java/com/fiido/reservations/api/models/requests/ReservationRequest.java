@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ReservationRequest {
-
   private String clientId;
   private Long hotelId;
   private Integer totalDays;
