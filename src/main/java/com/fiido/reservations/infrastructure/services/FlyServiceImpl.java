@@ -2,6 +2,7 @@ package com.fiido.reservations.infrastructure.services;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -38,17 +39,20 @@ public class FlyServiceImpl implements FlyService {
 
   @Override
   public Set<FlyResponse> readLessPrice(BigDecimal price) {
-    throw new UnsupportedOperationException("Unimplemented method 'readLessPrice'");
+    return this.flyRepository.findByPriceLessThan(price).stream().map(this::entityToResponse)
+        .collect(Collectors.toSet());
   }
 
   @Override
   public Set<FlyResponse> readBetweenPrice(BigDecimal min, BigDecimal max) {
-    throw new UnsupportedOperationException("Unimplemented method 'readBetweenPrice'");
+    return this.flyRepository.findByPriceIsBetween(min, max).stream().map(this::entityToResponse)
+        .collect(Collectors.toSet());
   }
 
   @Override
   public Set<FlyResponse> readByOriginDestiny(String origin, String destiny) {
-    throw new UnsupportedOperationException("Unimplemented method 'readByOriginDestiny'");
+    return this.flyRepository.findByOriginNameAndDestinyName(origin, destiny).stream().map(this::entityToResponse)
+        .collect(Collectors.toSet());
   }
 
   private FlyResponse entityToResponse(FlyEntity entity) {
