@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fiido.reservations.api.models.requests.ReservationRequest;
 import com.fiido.reservations.api.models.responses.CustomerResponse;
@@ -15,9 +16,9 @@ import com.fiido.reservations.domain.entities.ReservationEntity;
 import com.fiido.reservations.domain.repositories.CustomerRepository;
 import com.fiido.reservations.domain.repositories.HotelRepository;
 import com.fiido.reservations.domain.repositories.ReservationRepository;
+import com.fiido.reservations.infrastructure.helpers.CustomerHelper;
 import com.fiido.reservations.infrastructure.interfaces.ReservationService;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,7 @@ public class ReservationServiceImpl implements ReservationService {
   private final HotelRepository hotelRepository;
   private final CustomerRepository customerRepository;
   private final ReservationRepository reservationRepository;
+  private final CustomerHelper customerHelper;
 
   @Override
   public ReservationResponse create(ReservationRequest request) {
@@ -43,6 +45,8 @@ public class ReservationServiceImpl implements ReservationService {
         .dateEnd(LocalDate.now().plusDays(request.getTotalDays()))
         .price(hotel.getPrice().multiply(BigDecimal.valueOf(1.20)))
         .build();
+
+    this.customerHelper.increase(customer.getDni(), ReservationServiceImpl.class);
 
     return this.entityToResponse(this.reservationRepository.save(reservation));
   }
@@ -59,7 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     reservation.setHotel(hotel);
     reservation.setTotalDays(request.getTotalDays());
-    
+
     log.info("Updating reservation with id: {}", id);
     return this.entityToResponse(this.reservationRepository.save(reservation));
   }

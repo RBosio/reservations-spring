@@ -15,6 +15,7 @@ import com.fiido.reservations.domain.entities.TicketEntity;
 import com.fiido.reservations.domain.repositories.CustomerRepository;
 import com.fiido.reservations.domain.repositories.FlyRepository;
 import com.fiido.reservations.domain.repositories.TicketRepository;
+import com.fiido.reservations.infrastructure.helpers.CustomerHelper;
 import com.fiido.reservations.infrastructure.interfaces.TicketService;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class TicketServiceImpl implements TicketService {
   private final FlyRepository flyRepository;
   private final CustomerRepository customerRepository;
   private final TicketRepository ticketRepository;
+  private final CustomerHelper customerHelper;
 
   @Override
   public TicketResponse create(TicketRequest request) {
@@ -43,6 +45,7 @@ public class TicketServiceImpl implements TicketService {
         .departureDate(LocalDateTime.now())
         .build();
 
+    this.customerHelper.increase(customer.getDni(), TicketServiceImpl.class);
     log.info("Ticket created: {}", ticket);
 
     return this.entityToResponse(this.ticketRepository.save(ticket));
