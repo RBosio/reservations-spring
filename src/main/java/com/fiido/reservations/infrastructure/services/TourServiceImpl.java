@@ -21,6 +21,8 @@ import com.fiido.reservations.domain.repositories.TourRepository;
 import com.fiido.reservations.infrastructure.helpers.CustomerHelper;
 import com.fiido.reservations.infrastructure.helpers.TourHelper;
 import com.fiido.reservations.infrastructure.interfaces.TourService;
+import com.fiido.reservations.util.Tables;
+import com.fiido.reservations.util.exceptions.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -37,13 +39,17 @@ public class TourServiceImpl implements TourService {
 
   @Override
   public TourResponse create(TourRequest request) {
-    var customer = this.customerRepository.findById(request.getCustomerId()).orElseThrow();
+    var customer = this.customerRepository.findById(request.getCustomerId())
+        .orElseThrow(() -> new NotFoundException(Tables.customer.name()));
     var flights = new HashSet<FlyEntity>();
-    request.getFlights().forEach(fly -> flights.add(this.flyRepository.findById(fly.getId()).orElseThrow()));
+    request.getFlights().forEach(fly -> flights
+        .add(this.flyRepository.findById(fly.getId()).orElseThrow(() -> new NotFoundException(Tables.fly.name()))));
 
     var hotels = new HashMap<HotelEntity, Integer>();
     request.getHotels()
-        .forEach(hotel -> hotels.put(this.hotelRepository.findById(hotel.getId()).orElseThrow(), hotel.getTotalDays()));
+        .forEach(hotel -> hotels.put(
+            this.hotelRepository.findById(hotel.getId()).orElseThrow(() -> new NotFoundException(Tables.hotel.name())),
+            hotel.getTotalDays()));
 
     var tour = TourEntity.builder()
         .tickets(this.tourHelper.createTickets(flights, customer))
@@ -64,7 +70,7 @@ public class TourServiceImpl implements TourService {
 
   @Override
   public TourResponse read(Long id) {
-    var tour = this.tourRepository.findById(id).orElseThrow();
+    var tour = this.tourRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.tour.name()));
     return TourResponse.builder()
         .reservationIds(tour.getReservations().stream().map(ReservationEntity::getId).collect(Collectors.toSet()))
         .ticketIds(tour.getTickets().stream().map(TicketEntity::getId).collect(Collectors.toSet()))
@@ -74,21 +80,21 @@ public class TourServiceImpl implements TourService {
 
   @Override
   public void delete(Long id) {
-    var tour = this.tourRepository.findById(id).orElseThrow();
+    var tour = this.tourRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.tour.name()));
     this.tourRepository.delete(tour);
   }
 
   @Override
   public void removeTicket(Long tourId, Long ticketId) {
-    var tour = this.tourRepository.findById(tourId).orElseThrow();
+    var tour = this.tourRepository.findById(tourId).orElseThrow(() -> new NotFoundException(Tables.tour.name()));
     tour.removeTicket(ticketId);
     this.tourRepository.save(tour);
   }
 
   @Override
   public void addTicket(Long tourId, Long flyId) {
-    var tour = this.tourRepository.findById(tourId).orElseThrow();
-    var fly = this.flyRepository.findById(flyId).orElseThrow();
+    var tour = this.tourRepository.findById(tourId).orElseThrow(() -> new NotFoundException(Tables.tour.name()));
+    var fly = this.flyRepository.findById(flyId).orElseThrow(() -> new NotFoundException(Tables.fly.name()));
 
     var ticket = this.tourHelper.createTicket(fly, tour.getCustomer());
     tour.addTicket(ticket);
@@ -97,15 +103,15 @@ public class TourServiceImpl implements TourService {
 
   @Override
   public void removeReservation(Long tourId, Long reservationId) {
-    var tour = this.tourRepository.findById(tourId).orElseThrow();
+    var tour = this.tourRepository.findById(tourId).orElseThrow(() -> new NotFoundException(Tables.tour.name()));
     tour.removeTicket(reservationId);
     this.tourRepository.save(tour);
   }
 
   @Override
   public void addReservation(Long tourId, Long hotelId, Integer totalDays) {
-    var tour = this.tourRepository.findById(tourId).orElseThrow();
-    var hotel = this.hotelRepository.findById(hotelId).orElseThrow();
+    var tour = this.tourRepository.findById(tourId).orElseThrow(() -> new NotFoundException(Tables.tour.name()));
+    var hotel = this.hotelRepository.findById(hotelId).orElseThrow(() -> new NotFoundException(Tables.hotel.name()));
     this.tourHelper.createReservation(hotel, tour.getCustomer(), totalDays);
   }
 }

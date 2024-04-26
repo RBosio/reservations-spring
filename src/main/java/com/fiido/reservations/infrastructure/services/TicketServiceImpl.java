@@ -17,6 +17,8 @@ import com.fiido.reservations.domain.repositories.FlyRepository;
 import com.fiido.reservations.domain.repositories.TicketRepository;
 import com.fiido.reservations.infrastructure.helpers.CustomerHelper;
 import com.fiido.reservations.infrastructure.interfaces.TicketService;
+import com.fiido.reservations.util.Tables;
+import com.fiido.reservations.util.exceptions.NotFoundException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +35,8 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   public TicketResponse create(TicketRequest request) {
-    var fly = this.flyRepository.findById(request.getFlyId()).orElseThrow();
-    var customer = this.customerRepository.findById(request.getClientId()).orElseThrow();
+    var fly = this.flyRepository.findById(request.getFlyId()).orElseThrow(() -> new NotFoundException(Tables.fly.name()));
+    var customer = this.customerRepository.findById(request.getClientId()).orElseThrow(() -> new NotFoundException(Tables.customer.name()));
 
     var ticket = TicketEntity.builder()
         .fly(fly)
@@ -53,13 +55,13 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   public TicketResponse read(Long id) {
-    return this.entityToResponse(this.ticketRepository.findById(id).orElseThrow());
+    return this.entityToResponse(this.ticketRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.ticket.name())));
   }
 
   @Override
   public TicketResponse update(Long id, TicketRequest request) {
-    var ticket = this.ticketRepository.findById(id).orElseThrow();
-    var fly = this.flyRepository.findById(request.getFlyId()).orElseThrow();
+    var ticket = this.ticketRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.ticket.name()));
+    var fly = this.flyRepository.findById(request.getFlyId()).orElseThrow(() -> new NotFoundException(Tables.fly.name()));
     ticket.setFly(fly);
     ticket.setPrice(ticket.getPrice().multiply(BigDecimal.valueOf(1.20)));
 
@@ -68,7 +70,7 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   public void delete(Long id) {
-    var ticket = this.ticketRepository.findById(id).orElseThrow();
+    var ticket = this.ticketRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.ticket.name()));
     this.ticketRepository.delete(ticket);
   }
 
