@@ -14,6 +14,7 @@ import com.fiido.reservations.api.models.requests.ReservationRequest;
 import com.fiido.reservations.api.models.responses.ReservationResponse;
 import com.fiido.reservations.infrastructure.interfaces.ReservationService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -23,7 +24,7 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   @PostMapping
-  public ResponseEntity<ReservationResponse> create(@RequestBody ReservationRequest request) {
+  public ResponseEntity<ReservationResponse> create(@Valid @RequestBody ReservationRequest request) {
     return ResponseEntity.ok(this.reservationService.create(request));
   }
 
@@ -33,7 +34,8 @@ public class ReservationController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<ReservationResponse> update(@PathVariable Long id, @RequestBody ReservationRequest request) {
+  public ResponseEntity<ReservationResponse> update(@PathVariable Long id,
+      @Valid @RequestBody ReservationRequest request) {
     return ResponseEntity.ok(this.reservationService.update(id, request));
   }
 

@@ -2,28 +2,31 @@ package com.fiido.reservations.api.controllers.error_handlers;
 
 import java.util.ArrayList;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.fiido.reservations.api.models.responses.ErrorResponse;
-import com.fiido.reservations.util.exceptions.NotFoundException;
 
 @RestControllerAdvice
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class NotFoundController {
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class BadRequestController {
 
-  @ExceptionHandler(NotFoundException.class)
-  public ErrorResponse notFound(NotFoundException ex) {
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ErrorResponse badRequest(MethodArgumentNotValidException ex) {
     var errors = new ArrayList<String>();
-    errors.add(ex.getMessage());
-
+    ex.getAllErrors().forEach(error -> {
+      errors.add(error.getDefaultMessage());
+    });
     return ErrorResponse
         .builder()
         .errors(errors)
-        .code(HttpStatus.NOT_FOUND.value())
-        .status(HttpStatus.NOT_FOUND.name())
-        .build();
+        .code(HttpStatus.BAD_REQUEST
+            .value())
+        .status(HttpStatus.BAD_REQUEST.name()).build();
   }
+
 }

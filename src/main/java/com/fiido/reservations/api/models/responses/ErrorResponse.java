@@ -1,5 +1,7 @@
 package com.fiido.reservations.api.models.responses;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ErrorResponse {
-  String message;
+  List<String> errors;
   String status;
   Integer code;
 }
