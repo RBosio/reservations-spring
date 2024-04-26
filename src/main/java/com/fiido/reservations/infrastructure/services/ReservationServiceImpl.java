@@ -18,6 +18,8 @@ import com.fiido.reservations.domain.repositories.HotelRepository;
 import com.fiido.reservations.domain.repositories.ReservationRepository;
 import com.fiido.reservations.infrastructure.helpers.CustomerHelper;
 import com.fiido.reservations.infrastructure.interfaces.ReservationService;
+import com.fiido.reservations.util.Tables;
+import com.fiido.reservations.util.exceptions.NotFoundException;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +36,9 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   public ReservationResponse create(ReservationRequest request) {
-    var hotel = this.hotelRepository.findById(request.getHotelId()).orElseThrow();
-    var customer = this.customerRepository.findById(request.getClientId()).orElseThrow();
+    var hotel = this.hotelRepository.findById(request.getHotelId())
+        .orElseThrow(() -> new NotFoundException(Tables.hotel.name()));
+    var customer = this.customerRepository.findById(request.getClientId()).orElseThrow(() -> new NotFoundException(Tables.customer.name()));
     var reservation = ReservationEntity.builder()
         .hotel(hotel)
         .customer(customer)
@@ -53,13 +56,13 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   public ReservationResponse read(Long id) {
-    return this.entityToResponse(this.reservationRepository.findById(id).orElseThrow());
+    return this.entityToResponse(this.reservationRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.reservation.name())));
   }
 
   @Override
   public ReservationResponse update(Long id, ReservationRequest request) {
-    var reservation = this.reservationRepository.findById(id).orElseThrow();
-    var hotel = this.hotelRepository.findById(request.getHotelId()).orElseThrow();
+    var reservation = this.reservationRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.reservation.name()));
+    var hotel = this.hotelRepository.findById(request.getHotelId()).orElseThrow(() -> new NotFoundException(Tables.hotel.name()));
 
     reservation.setHotel(hotel);
     reservation.setTotalDays(request.getTotalDays());
@@ -70,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   public void delete(Long id) {
-    var reservation = this.reservationRepository.findById(id).orElseThrow();
+    var reservation = this.reservationRepository.findById(id).orElseThrow(() -> new NotFoundException(Tables.reservation.name()));
     this.reservationRepository.delete(reservation);
   }
 
