@@ -1,5 +1,6 @@
 package com.fiido.reservations.api.models.responses;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class HotelResponse {
+public class HotelResponse implements Serializable {
   private Long id;
   private String name;
   private String address;

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,18 +39,21 @@ public class HotelServiceImpl implements HotelService {
   }
 
   @Override
+  @Cacheable(value = "hotels")
   public Set<HotelResponse> readLessPrice(BigDecimal price) {
     return this.hotelRepository.findByPriceLessThan(price).stream().map(this::entityToResponse)
         .collect(Collectors.toSet());
   }
 
   @Override
+  @Cacheable(value = "hotels")
   public Set<HotelResponse> readBetweenPrice(BigDecimal min, BigDecimal max) {
     return this.hotelRepository.findByPriceIsBetween(min, max).stream().map(this::entityToResponse)
         .collect(Collectors.toSet());
   }
 
   @Override
+  @Cacheable(value = "hotels")
   public Set<HotelResponse> findRatingGreaterThan(Integer rating) {
     return this.hotelRepository.findByRatingGreaterThan(rating).stream().map(this::entityToResponse)
         .collect(Collectors.toSet());
